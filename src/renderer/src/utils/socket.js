@@ -1,5 +1,4 @@
 import { io } from "socket.io-client";
-import { getHostname, getPort } from "./network";
 class SocketManager {
   static instance = null;
   socket = null;
@@ -13,43 +12,30 @@ class SocketManager {
   }
 
   async initialize() {
-    const port = await this.determinePort();
-    const socketUrl = this.constructSocketUrl(port);
-    this.socket = io(socketUrl);
-  }
-
-  async determinePort() {
-    const windowPort = window.location.port;
-    const defaultPort = windowPort - 1;
-    return defaultPort === 5173 || defaultPort === 5172
-      ? await this.fetchPort(3333)
-      : await this.fetchPort(windowPort);
-  }
-
-  async fetchPort(fallbackPort) {
-    const localhostname = getHostname();
-    const protocol = window.location.protocol;
-    const ipport = protocol === "file:" ? 3333 : await getPort(localhostname);
-    const fetchurl = `http://${localhostname}:${ipport}`;
-    console.log("fetchurl", fetchurl);
-    try {
-      const response = await fetch(
-        `${fetchurl}/port`,
-      );
-      const { port } = await response.json();
-      console.log("Socket.IO server port:", port);
-      return port;
-    } catch (error) {
-      console.error("Error fetching port:", error);
-      return fallbackPort;
+    const port = window.location.port || 3333;
+    if (port === 5173 || port === '5173') {
+      console.log("port", port);
+      const socketUrl = this.constructSocketUrl(3333);
+      this.socket = io(socketUrl);
+    } else {
+      console.log("port", port);
+      const socketUrl = this.constructSocketUrl(port);
+      this.socket = io(socketUrl);
     }
-  }
 
+  }
   constructSocketUrl(port) {
     const { protocol, hostname } = window.location;
-    return protocol.startsWith("file")
-      ? `http://localhost:${port}`
-      : `${protocol}//${hostname}:${port}`;
+    if (protocol === "file:") {
+      console.log("protocol", protocol);
+      return `http://localhost:${port}`;
+    } else if (protocol === "https:") {
+      console.log(`${protocol}//${hostname}:${window.location.port}`);
+      return `${protocol}//${hostname}:${window.location.port}`;
+    } else if (protocol === "http:") {
+      console.log("protocol", protocol, `http://${window.location.hostname}:${port}`);
+      return `http://${window.location.hostname}:${port}`;
+    }
   }
 
   emitMessage(eventName, data) {

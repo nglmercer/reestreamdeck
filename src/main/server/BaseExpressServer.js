@@ -1,50 +1,22 @@
 import express from "express";
 import cors from "cors";
-import http from "http";
-import https from "https";
 import { join } from "path";
-import os from "os";
 
-class ExpressServer {
+class BaseExpressServer {
   constructor() {
     this.app = express();
     this.server = null;
     this.isConnected = false;
     this.port = null;
-    this.ip = this.getLocalIP();
   }
-  getLocalIP() {
-    const interfaces = os.networkInterfaces();
-    for (const devName in interfaces) {
-      const iface = interfaces[devName];
-      for (let i = 0; i < iface.length; i++) {
-        const alias = iface[i];
-        if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
-          return alias.address;
-        }
-      }
-    }
-    return '0.0.0.0';  // fallback to all interfaces if no specific IP is found
-  }
-  initialize = (port = 3000, credentials = null) => {
-    console.log("Initializing Express server...");
 
+  setupMiddleware() {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.static(join(__dirname, "../renderer")));
-    // Si se pasan credenciales, inicia un servidor HTTPS; de lo contrario, inicia HTTP
-    if (credentials) {
-      this.server = https.createServer(credentials, this.app);
-      console.log("Starting HTTPS server...");
-    } else {
-      this.server = http.createServer(this.app);
-      console.log("Starting HTTP server...");
-    }
-
-    return this.listenOnPort(port); // Devuelve una promesa para manejar la inicialización
   }
 
-  listenOnPort = (port) => {
+  listenOnPort(port) {
     return new Promise((resolve) => {
       if (this.isConnected) {
         console.log("Server is already running. Closing existing connection...");
@@ -57,10 +29,10 @@ class ExpressServer {
     });
   }
 
-  startListening = (port, resolve) => {
+  startListening(port, resolve) {
     this.server.listen(port, () => {
       this.port = this.server.address().port;
-      console.log(`Express server is running on port ${this.port}`);
+      console.log(`${this.constructor.name} is running on port ${this.port}`);
       this.isConnected = true;
       resolve(true);
     });
@@ -76,11 +48,11 @@ class ExpressServer {
     });
   }
 
-  onEvent = (eventName, callback) => {
+  onEvent(eventName, callback) {
     this.app.on(eventName, callback);
   }
 
-  addRoute = (method, path, handler) => {
+  addRoute(method, path, handler) {
     switch (method.toLowerCase()) {
       case 'get':
         this.app.get(path, handler);
@@ -99,14 +71,14 @@ class ExpressServer {
     }
   }
 
-  onDisconnect = (callback) => {
+  onDisconnect(callback) {
     this.server.on("close", callback);
   }
 
-  close = (callback) => {
+  close(callback) {
     if (this.server) {
       this.server.close(() => {
-        console.log("Express server closed");
+        console.log(`${this.constructor.name} closed`);
         this.isConnected = false;
         if (callback) callback();
       });
@@ -115,9 +87,9 @@ class ExpressServer {
     }
   }
 
-  getListenPort = () => {
+  getListenPort() {
     return this.port;
   }
 }
 
-export default ExpressServer;
+export default BaseExpressServer;

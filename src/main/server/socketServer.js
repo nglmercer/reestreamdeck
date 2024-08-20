@@ -10,11 +10,6 @@ class SocketHandler {
   }
 
   initialize = (server) => {
-    console.log("Initializing Socket.IO server...");
-    if (this.isInitialized) {
-      console.log("Socket server is already initialized.");
-      return;
-    }
     this.server = server;
     this.io = new Server(server, {
       cors: {
@@ -49,10 +44,10 @@ class SocketHandler {
   }
 
   listensocket = async (port = 0) => {
-    if (this.isInitialized) {
-      console.log("Socket server is already listening.");
-      return Promise.resolve(this.port);
-    }
+    // if (this.isInitialized) {
+    //   console.log("Socket server is already listening.");
+    //   return Promise.resolve(this.port);
+    // }
     return new Promise((resolve, reject) => {
       try {
         this.server.listen(port, () => {
@@ -68,6 +63,7 @@ class SocketHandler {
   }
 
   getListenPort = () => {
+    console.log("getListenPort", this.port);
     return this.port;
   }
 }

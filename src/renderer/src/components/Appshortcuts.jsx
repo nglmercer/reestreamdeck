@@ -9,8 +9,11 @@ function Appshortcuts() {
     try {
       const protocol = window.location.protocol;
       const localhostname = getHostname();
-      const ipport = protocol === "file:" ? 3333 : await getPort(localhostname);
-      const fetchurl = `http://${localhostname}:${ipport}`;
+      let Port = window.location.port;
+      if (Port === 5173 || Port === '5173' ) {
+        Port = 3333;
+      }
+      const fetchurl = `${protocol}//${localhostname}:${Port}`;
       console.log("fetchurl", fetchurl);
 
       try {

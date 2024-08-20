@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import socketManager from "../utils/socket";
-import { getHostname, getPort } from "../utils/network";
 
 function Appshortcuts() {
   const [apps, setApps] = useState([]);
@@ -8,7 +7,7 @@ function Appshortcuts() {
   const getapps = async () => {
     try {
       const protocol = window.location.protocol;
-      const localhostname = getHostname();
+      const localhostname = window.location.hostname;
       let Port = window.location.port;
       if (Port === 5173 || Port === '5173' ) {
         Port = 3333;

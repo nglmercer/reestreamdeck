@@ -1,7 +1,7 @@
 import os from "os";
 import QRCode from "qrcode";
-
-const getLocalIPAddress = () => {
+import { showQRModal } from "../qrModal";
+export const getLocalIPAddress = () => {
   const interfaces = os.networkInterfaces();
   for (const interfaceName in interfaces) {
     const addresses = interfaces[interfaceName];
@@ -13,23 +13,21 @@ const getLocalIPAddress = () => {
   }
   return "IP address not found";
 };
-const localIP = getLocalIPAddress();
-const urlToQR = `https://${localIP}:${Port}`;
 
-QRCode.toDataURL(urlToQR, (err, qrCode) => {
-  if (err) {
-    console.error("Error generating QR code:", err);
-    return;
-  }
+const injectQRCode = (mainWindow, port) => {
+  const localIP = getLocalIPAddress();
+  const urlToQR = `https://${localIP}:${port}`;
 
-  mainWindow.webContents.on("dom-ready", () => {
-    console.log("dom-ready");
+  QRCode.toDataURL(urlToQR, (err, qrCode) => {
+    if (err) {
+      console.error("Error generating QR code:", err);
+      return;
+    }
+
     mainWindow.webContents.executeJavaScript(`
-      (${showQRModal.toString()})("${qrCode}","${urlToQR}");
+      (${showQRModal.toString()})("${qrCode}", "${urlToQR}");
     `);
   });
+};
 
-  // Si necesitas enviar este código QR a otro lugar, puedes usar la variable 'qrCode'
-  // que contiene la representación base64 de la imagen del QR.
-});
-export { getLocalIPAddress };
+export default injectQRCode;

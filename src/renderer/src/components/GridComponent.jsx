@@ -174,11 +174,11 @@ const GridComponent = ({
               onClick={(e) => handleSelect(e, item.id)}
             >
               <div className="grid-item text-white font-bold py-2 px-4 rounded h-full w-full">
-                <div className="item-content">{item.content}</div>
+                <div className="item-content">{item.content ? item.content : item.application}</div>
                 <div className="position-debug">{item.positionIndex}</div>{" "}
                 {/* Para debug style={{ backgroundColor: item.color }} */}
                 <GridButton
-                  text={item.value?.map((val) => val.label).join(" + ")}
+                  text={item.value?.map((val) => val.label).join(" + ") ? item.value?.map((val) => val.label).join(" + ") : item.application}
                   callback={() => callback(item)}
                 />
               </div>

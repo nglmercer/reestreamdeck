@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, act } from "react";
 import { openDB } from "idb";
 import GridComponent from "./components/GridComponent";
 import Modalconfig from "./modalconfig";
@@ -48,6 +48,9 @@ const Gridcontent = () => {
       value: item.keyvalue,
       color: item.color ? item.color : "btn-primary",
       position: item.position ? { ...item.position } : { x: 0, y: 0 },
+      actionType: item.actionType,
+      application: item.application,
+
     }));
   };
 
@@ -83,13 +86,22 @@ const Gridcontent = () => {
   };
 
   const handleCallback = (data) => {
-    console.log("callback 1234124124", data, data.value);
+    // console.log("Ejecutando callback con datos:", data);
 
-    if (data.value.length > 0) {
-      const keysToPress = data.value.map((item) => Number(item.value));
-      socketManager.emitMessage("presskey", keysToPress);
+    if (data.actionType === "keyPress") {
+      console.log("Ejecutando keyPress:", data);
+      if (data.value.length > 0) {
+        const keysToPress = data.value.map((item) => Number(item.value));
+        socketManager.emitMessage("presskey", keysToPress);
+      }
+
+    } else if (data.actionType === "openApp") {
+      console.log("Ejecutando openApp:", data);
+      const appPath = data.application;
+      socketManager.emitMessage("openapp", { path: appPath });
     }
   };
+
 
   const handleSave = () => {
     loadItemsFromDB(); // Recargar los datos cuando se guarda algo en el modal

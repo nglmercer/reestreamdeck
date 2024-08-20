@@ -58,7 +58,7 @@ async function startServer() {
 startServer()
 function handleSocketEvents(socket, index) {
   console.log(`New client connected on socket ${index + 1}:`, socket.id);
-
+  socket.emit("getapps", getInstalledApplications());
   sendAudioData(socket);
   const intervalId = setInterval(() => sendAudioData(socket), UPDATE_INTERVAL);
 

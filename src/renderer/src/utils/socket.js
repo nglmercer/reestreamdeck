@@ -53,6 +53,7 @@ class SocketManager {
 
   emitMessage(eventName, data) {
     if (this.socket) {
+      // console.log("emitMessage", eventName, data);
       this.socket.emit(eventName, data);
     } else {
       console.error("Socket is not initialized");

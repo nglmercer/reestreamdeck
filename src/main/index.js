@@ -86,17 +86,12 @@ function handleSocketEvents(socket, index) {
 
   socket.on("setMasterVolume", (volume) => handleVolumeChange(socket, volume));
   socket.on("presskey", (key) => handleKeyPress(socket, key));
-  socket.on("presskey2", (key) => handleKeyPress2(socket, key));
-  socket.on("releasekey", (key) => handleKeyRelease(socket, key));
+  socket.on("pressKey2", (key) => handleKeyPress2(socket, key));
+  socket.on("releaseKey", (key) => handleKeyRelease(socket, key));
   socket.on("setVolume", ({ pid, volume }) => handleSessionVolumeChange(socket, pid, volume));
   socket.on("openapp", (data) => handleAppOpen(socket, data));
 }
-function handleKeyPress2(socket, key) {
-  console.log("keypressed2", key);
-}
-function handleKeyPress(socket, key) {
-  console.log("keypressed", key);
-}
+
 function handleVolumeChange(socket, volume) {
   try {
     audioController.setMasterVolume(volume);
@@ -105,8 +100,25 @@ function handleVolumeChange(socket, volume) {
     socket.emit("error", error.message);
   }
 }
-
+function handleKeyRelease(socket, key) {
+  try{
+  console.log("keyreleased", key);
+  keynut.keyboardController.handleKeyRelease(key)
+  } catch (error) {
+    console.error("Error al liberar el teclado:", error);
+  }
+}
+function handleKeyPress2(socket, key) {
+  try{
+  console.log("keypressed2", key);
+  keynut.keyboardController.handleKeyPress(key)
+  } catch (error) {
+    console.error("Error al presionar el teclado:", error);
+  }
+}
 function handleKeyPress(socket, key) {
+  console.log("keypressed", key);
+
   try {
     keynut.keyboardController.parseAndExecuteKeyCommand(key);
     socket.emit("keypressed", key);
@@ -200,6 +212,7 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
+  keynut.keyboardController.releaseAllKeys();
   if (process.platform !== "darwin") {
     app.quit();
   }

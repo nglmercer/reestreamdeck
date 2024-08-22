@@ -1,6 +1,6 @@
-# reestreamreactapp
+# reestreamvan
 
-An Electron application with React
+A minimal Electron application with JavaScript
 
 ## Recommended IDE Setup
 

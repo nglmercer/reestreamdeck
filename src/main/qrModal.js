@@ -17,7 +17,7 @@ export function showQRModal(qrCode, urlToQR) {
   // Crear el contenido del modal
   const modalContent = document.createElement("div");
 
-  modalContent.innerHTML = `<h1>Scan QRcode, link <a href="${urlToQR}">${urlToQR}</a></h1><img src="${qrCode}" style="height: 90%; width: 90%;" alt="QR Code">`;
+  modalContent.innerHTML = `<h2>Scan QRcode, link <a href="${urlToQR}">${urlToQR}</a></h2><img src="${qrCode}" style="height: 90%; width: 90%;" alt="QR Code">`;
   modalContent.style.padding = "20px";
   modalContent.style.width = "50%";
   modalContent.style.height = "50%";
